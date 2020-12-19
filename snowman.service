@@ -1,0 +1,10 @@
+[Unit]
+Description=Snowman Lights
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /home/pi/snowman.py
+
+[Install]
+WantedBy=multi-user.target
