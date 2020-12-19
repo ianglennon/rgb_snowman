@@ -21,7 +21,7 @@ class RGBSnowman:
     pwm_green: GPIO.PWM
     pwm_blue: GPIO.PWM
     state: State
-    current_colour: tuple(int, int, int)
+    current_colour: tuple
 
     standard_palette = [
         (0, 0, 255),
@@ -66,10 +66,10 @@ class RGBSnowman:
         self.fade_time = fade_time
         self.pause_time = pause_time
 
-    def change_colour(self, palette: list = None, with_set = False):
+    def change_colour(self, palette: list = None, with_set=False):
         if palette is None:
             palette = self.standard_palette
-        new_colour_idx = random.randint(0, len(palette)-1)
+        new_colour_idx = random.randint(0, len(palette) - 1)
         new_colour = palette[new_colour_idx]
         if self.current_colour is None:
             self.current_colour = (0, 0, 0)

@@ -44,4 +44,3 @@ if __name__ == '__main__':
 		loop(snowman=sman)
 	except KeyboardInterrupt:
 		sman.shutdown()
-
