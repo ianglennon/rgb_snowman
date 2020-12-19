@@ -1,4 +1,4 @@
-from rpi-RGBSnowman import RGBSnowman, State
+from rpi_RGBSnowman import RGBSnowman, State
 import RPi.GPIO as GPIO
 import signal
 from datetime import datetime
