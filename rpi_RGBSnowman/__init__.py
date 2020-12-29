@@ -8,6 +8,7 @@ class State(Enum):
     STOPPED = 1
     SWAP_STANDARD = 2
     FADE_STANDARD = 3
+    FTB_STANDARD = 4
 
 
 class RGBSnowman:
@@ -78,28 +79,24 @@ class RGBSnowman:
                 if self.state == State.SWAP_STANDARD:
                     self.set_colour(new_colour)
                 elif self.state == State.FADE_STANDARD:
-                    self.fade_colour(old_colour=self.current_colour, new_colour=new_colour)
+                    self.fade_colour(new_colour=new_colour)
+                elif self.state == State.FTB_STANDARD:
+                    self.ftb_colour(new_colour=new_colour)
             self.current_colour = new_colour
             return
         else:
             self.change_colour(palette=palette, with_set=with_set)
 
-    def fade_colour(self, old_colour: tuple, new_colour: tuple):
+    def fade_colour(self, new_colour: tuple):
         old_colour = self.current_colour
-        #print("FADE: new_colour: %s" % str(new_colour))
         fade_time = self.fade_time
         slice_time = fade_time / 1000
-        #print("FADE: slice_time: %s" % str(slice_time))
         r_diff = (new_colour[0] - old_colour[0]) / 1000
         g_diff = (new_colour[1] - old_colour[1]) / 1000
         b_diff = (new_colour[2] - old_colour[2]) / 1000
-        #print("FADE: old_colour[0] = %i : new_colour[0] = %i" % (old_colour[0], new_colour[0]))
-        #print("FADE: old_colour[1] = %i : new_colour[1] = %i" % (old_colour[1], new_colour[1]))
-        #print("FADE: old_colour[2] = %i : new_colour[2] = %i" % (old_colour[2], new_colour[2]))
-        #print("FADE: r_diff: %s, g_diff: %s, b_diff: %s" % (str(r_diff), str(g_diff), str(b_diff)))
         for i in range(0, 1000, 1):
             if self.state.value == 0:
-                self.set_colour(0, 0, 0)
+                self.set_colour((0, 0, 0))
                 self.stop()
                 return (0, 0, 0)
             i_colour = (old_colour[0] + (r_diff * i), old_colour[1] + (g_diff * i), old_colour[2] + (b_diff * i))
@@ -108,12 +105,41 @@ class RGBSnowman:
         self.set_colour(new_colour)
         return new_colour
 
+    def ftb_colour(self, new_colour: tuple):
+        old_colour = self.current_colour
+        fade_time = self.fade_time
+        slice_time = fade_time / 1000
+        r_diff = old_colour[0] / 1000
+        g_diff = old_colour[1] / 1000
+        b_diff = old_colour[2] / 1000
+        for i in range(0, 1000, 1):
+            if self.state.value == 0:
+                self.set_colour((0, 0, 0))
+                self.stop()
+                return (0, 0, 0)
+            i_colour = (old_colour[0] + (r_diff * i), old_colour[1] + (g_diff * i), old_colour[2] + (b_diff * i))
+            self.set_colour(i_colour)
+            time.sleep(slice_time)
+        self.set_colour((0, 0, 0))
+        time.sleep(self.pause_time)
+        r_diff = new_colour[0] / 1000
+        g_diff = new_colour[1] / 1000
+        b_diff = new_colour[2] / 1000
+        for i in range(0, 1000, 1):
+            if self.state.value == 0:
+                self.set_colour((0, 0, 0))
+                self.stop()
+                return (0, 0, 0)
+            i_colour = (r_diff * i, g_diff * i, b_diff * i)
+            self.set_colour(i_colour)
+            time.sleep(slice_time)
+        self.set_colour(new_colour)
+        return new_colour
+
     def set_colour(self, colour: tuple):
-        #print("colour: %s", str(colour))
         r = (colour[0] / 255) * 100
         g = (colour[1] / 255) * 100
         b = (colour[2] / 255) * 100
-        #print("r: %s, g: %s, b: %s", str(r), str(g), str(b))
         self.pwm_red.ChangeDutyCycle(r)
         self.pwm_green.ChangeDutyCycle(g)
         self.pwm_blue.ChangeDutyCycle(b)
